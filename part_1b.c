@@ -1,11 +1,12 @@
-#include <unistd.h>
-#include <time.h>
-#include <stdlib.h>
-#include <stdio.h>
-#include <stdbool.h>
 #include <math.h>
-#include <limits.h>
+#include <stdbool.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <stddef.h>
 #include <sys/wait.h>
+#include <time.h>
+#include <limits.h>
+#include <unistd.h>
 
 
 const int ARRAY_BUFFER_SIZE = 160;
@@ -28,9 +29,9 @@ const int MAX_CHILDREN_OPTIONS = 3;
 const int MIN_CHILDREN_OPTIONS = 2;
 int L, H, PN;
 int *fd;
-int data_array[ARRAY_BUFFER_SIZE];
-double delta_time = 0.0;
-clock_t time_beg;
+int data_array[160];
+double spent_time = 0.0;
+clock_t begin;
 
 void*
 mem_allocation_using_calloc(size_t num_elements, size_t element_size);
@@ -354,11 +355,11 @@ track_start_and_end(int max_child, const int *track_child_pid, int initial_end, 
 }
 
 void
-local_avg_from_child_calc(int *h, const int *array_buffer, int start, int end, int child_return, int *h_start,
-                          int *max, double *avg, int *count)
-{
+local_avg_from_child_calc(int *h, const int *array_buffer, int start, int end, int child_return, int *h_start, int *max,
+                          double *avg, int *count) {
     for (int j2 = start; j2 < end; j2++) {
         if (array_buffer[j2] > (*max)) (*max) = array_buffer[j2];
+
 
         (*avg) += array_buffer[j2];
         if (array_buffer[j2] <= -INIT_VAL && array_buffer[j2] >= -MAX_RANDOM_OFFSET) {
@@ -368,25 +369,24 @@ local_avg_from_child_calc(int *h, const int *array_buffer, int start, int end, i
             (*h_start) = (*h_start) + 3;
         }
     }
-    // Cast the divisor to double to ensure floating-point division
     (*avg) = (*avg) / (double)(end - start);
     (*count) = end - start;
 }
 
 void
-read_from_buffer_and_get_avg(const int *fd, const int *track_child_pid, int count, int *temp_max, double *temp_avg,
-                             int r, int *max, double *avg, int *temp_count, int **temp_h, int *temp_h_start)
-{
+read_from_buffer_and_get_avg(const int *fd, const int *track_child_pid, int count, int *temp_max, double *temp_avg, int r,
+                             int *max, double *avg, int *temp_count, int **temp_h, int *temp_h_start) {
     read(fd[2 * track_child_pid[r]], temp_max, sizeof(int));
-    read(fd[2 * track_child_pid[r]], temp_avg, sizeof(double)); // Change sizeof(long) to sizeof(double)
+    read(fd[2 * track_child_pid[r]], temp_avg, sizeof(long));
     read(fd[2 * track_child_pid[r]], temp_count, sizeof(int));
     read(fd[2 * track_child_pid[r]], temp_h, sizeof(int) * ARRAY_BUFFER_SIZE);
     read(fd[2 * track_child_pid[r]], temp_h_start, sizeof(int));
 
-    if ((*temp_max) >= (*max)) {
+    if ((*temp_max) >= (*max))
+    {
         (*max) = (*temp_max);
     }
-    (*avg) = (*temp_avg);
+    (*avg) = ((*avg) * count + (*temp_avg) * (*temp_count)) / (double)((*temp_count) + count); // Cast the divisor to double
 }
 
 int
@@ -539,8 +539,8 @@ process_children_to_parent_for_max_avg_output(int max_child, int root_parent, in
                 wait(NULL);
                 print_output_to_file(data_array, output, max, avg);
                 clock_t end = clock();
-                delta_time += (double)(end - time_beg) / CLOCKS_PER_SEC;
-                printf(TIME_TAKEN_MSG, (delta_time));
+                spent_time += (double)(end - begin) / CLOCKS_PER_SEC;
+                printf(TIME_TAKEN_MSG, (spent_time));
                 exit(0);
             }
             wait(NULL);
@@ -551,7 +551,7 @@ process_children_to_parent_for_max_avg_output(int max_child, int root_parent, in
 
 int
 main(int argc, char* argv[]) {
-    time_beg = clock();
+    begin = clock();
 
     if (argc != 4)
     {

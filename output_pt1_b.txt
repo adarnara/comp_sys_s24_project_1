@@ -1,41 +1,23 @@
-Hi I'm process 86578 with return arg 2 and my parent is 86573.
-Hi I'm process 86579 with return arg 3 and my parent is 86573.
-Hi I'm process 86580 with return arg 4 and my parent is 86578.
-Hi I'm process 86582 with return arg 5 and my parent is 86578.
-Hi I'm process 86581 with return arg 6 and my parent is 86579.
-Max: 9999, Avg: 4993.856497
+Hi I'm process 95017 with return arg 2 and my parent is 95016.
+Max: 9999, Avg: 4996.104715
 
-Hi I am Process 86580 with return argument 4 and I found the hidden key at position A[709].
-Hi I am Process 86580 with return argument 4 and I found the hidden key at position A[1885].
-Hi I am Process 86580 with return argument 4 and I found the hidden key at position A[34152].
-Hi I am Process 86580 with return argument 4 and I found the hidden key at position A[41318].
-Hi I am Process 86580 with return argument 4 and I found the hidden key at position A[113775].
-Hi I am Process 86580 with return argument 4 and I found the hidden key at position A[114819].
-Hi I am Process 86580 with return argument 4 and I found the hidden key at position A[127060].
-Hi I am Process 86580 with return argument 4 and I found the hidden key at position A[133892].
-Hi I am Process 86580 with return argument 4 and I found the hidden key at position A[164622].
-Hi I am Process 86580 with return argument 4 and I found the hidden key at position A[171527].
-Hi I am Process 86582 with return argument 5 and I found the hidden key at position A[254254].
-Hi I am Process 86582 with return argument 5 and I found the hidden key at position A[274816].
-Hi I am Process 86582 with return argument 5 and I found the hidden key at position A[276406].
-Hi I am Process 86582 with return argument 5 and I found the hidden key at position A[295431].
-Hi I am Process 86582 with return argument 5 and I found the hidden key at position A[304632].
-Hi I am Process 86582 with return argument 5 and I found the hidden key at position A[304999].
-Hi I am Process 86582 with return argument 5 and I found the hidden key at position A[343451].
-Hi I am Process 86582 with return argument 5 and I found the hidden key at position A[343485].
-Hi I am Process 86582 with return argument 5 and I found the hidden key at position A[358664].
-Hi I am Process 86582 with return argument 5 and I found the hidden key at position A[361892].
-Hi I am Process 86582 with return argument 5 and I found the hidden key at position A[365637].
-Hi I am Process 86582 with return argument 5 and I found the hidden key at position A[375103].
-Hi I am Process 86582 with return argument 5 and I found the hidden key at position A[388469].
-Hi I am Process 86582 with return argument 5 and I found the hidden key at position A[388928].
-Hi I am Process 86582 with return argument 5 and I found the hidden key at position A[399009].
-Hi I am Process 86582 with return argument 5 and I found the hidden key at position A[425456].
-Hi I am Process 86582 with return argument 5 and I found the hidden key at position A[444899].
-Hi I am Process 86582 with return argument 5 and I found the hidden key at position A[445461].
-Hi I am Process 86582 with return argument 5 and I found the hidden key at position A[447052].
-Hi I am Process 86582 with return argument 5 and I found the hidden key at position A[457489].
-Hi I am Process 86582 with return argument 5 and I found the hidden key at position A[499117].
-Hi I am Process 86579 with return argument 6 and I found the hidden key at position A[756550].
-Hi I am Process 86579 with return argument 6 and I found the hidden key at position A[781149].
-Hi I am Process 86579 with return argument 6 and I found the hidden key at position A[783054].
+Hi I am Process 95016 with return argument 2 and I found the hidden key at position A[505893].
+Hi I am Process 95016 with return argument 2 and I found the hidden key at position A[506389].
+Hi I am Process 95016 with return argument 2 and I found the hidden key at position A[523551].
+Hi I am Process 95016 with return argument 2 and I found the hidden key at position A[566192].
+Hi I am Process 95016 with return argument 2 and I found the hidden key at position A[566479].
+Hi I am Process 95016 with return argument 2 and I found the hidden key at position A[594670].
+Hi I am Process 95016 with return argument 2 and I found the hidden key at position A[597182].
+Hi I am Process 95016 with return argument 2 and I found the hidden key at position A[600903].
+Hi I am Process 95016 with return argument 2 and I found the hidden key at position A[605450].
+Hi I am Process 95016 with return argument 2 and I found the hidden key at position A[612087].
+Hi I am Process 95016 with return argument 2 and I found the hidden key at position A[630612].
+Hi I am Process 95016 with return argument 2 and I found the hidden key at position A[649010].
+Hi I am Process 95016 with return argument 2 and I found the hidden key at position A[652083].
+Hi I am Process 95016 with return argument 2 and I found the hidden key at position A[672223].
+Hi I am Process 95016 with return argument 2 and I found the hidden key at position A[677258].
+Hi I am Process 95016 with return argument 2 and I found the hidden key at position A[682885].
+Hi I am Process 95016 with return argument 2 and I found the hidden key at position A[721795].
+Hi I am Process 95016 with return argument 2 and I found the hidden key at position A[723705].
+Hi I am Process 95016 with return argument 2 and I found the hidden key at position A[738447].
+Hi I am Process 95016 with return argument 2 and I found the hidden key at position A[754754].

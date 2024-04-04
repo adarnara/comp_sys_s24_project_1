@@ -20,10 +20,10 @@ run_part_1a: part_1a
 	./part_1a 10000 34 6
 
 run_part_1b: part_1b
-	./part_1b 10000 20 2
+	./part_1b 1000000 20 2
 
 run_part_2: part_2
-	./part_2 10000 45 2
+	./part_2 100000 34 25
 
 run: run_part_1a run_part_1b run_part_2
 
