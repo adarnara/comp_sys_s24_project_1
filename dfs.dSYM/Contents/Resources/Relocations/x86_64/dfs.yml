@@ -1,0 +1,11 @@
+---
+triple:          'x86_64-apple-darwin'
+binary-path:     '/Users/adarshnarayanan/CompSystemProject1/dfs'
+relocations:
+  - { offsetInCU: 0x26, offset: 0x26, size: 0x8, addend: 0x0, symName: _generateTextFile, symObjAddr: 0x0, symBinAddr: 0x100002E00, symSize: 0x190 }
+  - { offsetInCU: 0x4D, offset: 0x4D, size: 0x8, addend: 0x0, symName: _L, symBinAddr: 0x100008004, symSize: 0x0 }
+  - { offsetInCU: 0x69, offset: 0x69, size: 0x8, addend: 0x0, symName: _H, symBinAddr: 0x100008000, symSize: 0x0 }
+  - { offsetInCU: 0x7E, offset: 0x7E, size: 0x8, addend: 0x0, symName: _PN, symBinAddr: 0x100008008, symSize: 0x0 }
+  - { offsetInCU: 0xAB, offset: 0xAB, size: 0x8, addend: 0x0, symName: _generateTextFile, symObjAddr: 0x0, symBinAddr: 0x100002E00, symSize: 0x190 }
+  - { offsetInCU: 0x131, offset: 0x131, size: 0x8, addend: 0x0, symName: _main, symObjAddr: 0x190, symBinAddr: 0x100002F90, symSize: 0xDD5 }
+...
