@@ -1,12 +1,11 @@
-
-#include <math.h>
-#include <stdbool.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <sys/wait.h>
-#include <time.h>
-#include <limits.h>
 #include <unistd.h>
+#include <time.h>
+#include <stdlib.h>
+#include <stdio.h>
+#include <stdbool.h>
+#include <math.h>
+#include <limits.h>
+#include <sys/wait.h>
 
 
 const int ARRAY_BUFFER_SIZE = 160;

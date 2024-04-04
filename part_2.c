@@ -14,7 +14,6 @@
 
 
 
-
 const int MAX_ELEM_NUM = 256;
 const int NUM_ARGS = 3;
 const int MAX_CHILDREN_OPTIONS = 3;
@@ -76,38 +75,32 @@ send_raise_with_signal_custom_handler(int delta);
 
 void
 custom_signal_handler(int sig) { is_signal_rec = true; }
-void
-custom_signal_handler2(int sig) { is_signal_rec = false; }
+
 
 void
 kill_c_proc(pid_t pid, int signal)
 {
-    pid_t c_proc_id;
     int status;
-    printf("Killed process ID is %d\n", pid);
+    printf("Terminating process ID %d\n", pid);
     kill(pid, signal);
 
-    while ((c_proc_id = waitpid(-1, &status, WNOHANG)) > 0) {
-        if (WIFSTOPPED(status)) {
-            continue;
-        }
-        else if (WIFCONTINUED(status)){
-            continue;
-        }
+
+    pid_t terminated_pid = waitpid(pid, &status, 0);
 
 
+    if (terminated_pid > 0) {
         if (WIFSIGNALED(status)) {
-            printf("Process number %d was killed by signal %d\n", c_proc_id, WTERMSIG(status));
+            printf("Process %d was terminated by signal %d\n", terminated_pid, WTERMSIG(status));
         }
         else if (WIFEXITED(status)) {
-            printf("Process number %d was exited with status %d\n", c_proc_id, WEXITSTATUS(status));
+            printf("Process %d exited with status %d\n", terminated_pid, WEXITSTATUS(status));
         }
         else {
-            printf("Process number %d was exited with unknown status\n", c_proc_id);
+            printf("Process %d terminated with unknown status\n", terminated_pid);
         }
-
-
-        kill_c_proc(c_proc_id, signal);
+    }
+    else {
+        printf("Error waiting for process %d\n", pid);
     }
 }
 
@@ -212,11 +205,8 @@ main(int argc, char* argv[])
             if (user_input_num_of_max_children == 2){
                 child_proc_arg = 2 * (child_proc_arg) - 1;
             }
-            else if (user_input_num_of_max_children == 3) {
+            else{
                 child_proc_arg = 3 * (child_proc_arg) - 2;
-            }
-            else {
-                child_proc_arg = 4 * (child_proc_arg) - 3;
             }
         }
         child_gen_process_pid = getpid();
@@ -419,8 +409,6 @@ void
 send_raise_with_signal_custom_handler(int delta)
 {
     signal(SIGCONT, &custom_signal_handler);
-    sleep(delta);
-    signal(SIGALRM, &custom_signal_handler2);
     sleep(delta);
     raise(SIGTSTP);
     sleep(delta);
