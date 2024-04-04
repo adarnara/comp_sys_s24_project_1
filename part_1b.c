@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stddef.h>
+#include <stddef.h>
 #include <sys/wait.h>
 #include <time.h>
 #include <limits.h>
@@ -19,7 +20,7 @@ char *const FILE_MODE_APPEND = "a+";
 const int MAX_RANDOM_RANGE = 10000;
 const int MAX_RANDOM_OFFSET = 60;
 const char *PROCESS_INFO_FORMAT = "Hi I'm process %d with return arg %d and my parent is %d.\n";
-char *const RESULT_MSG_MAX_MIN = "Max: %d, Avg: %f\n\n";
+char *const RESULT_MSG_MAX_MIN = "Max: %d, Avg: %f\n";
 char *const RESULT_MSG_FORMAT = "Hi I am Process %d with return argument %d and I found the ""hidden key at position A[%d].\n";
 char *const PROMPT_MSG = "How Many Children Do You Want (Must Choose: 2 or 3)?\n";
 static char *const TIME_TAKEN_MSG = "Elapsed time %f [s]\n";
@@ -31,7 +32,7 @@ int L, H, PN;
 int *fd;
 int data_array[160];
 double spent_time = 0.0;
-clock_t begin;
+
 
 void*
 mem_allocation_using_calloc(size_t num_elements, size_t element_size);
@@ -93,7 +94,7 @@ void
 process_children_to_parent_for_max_avg_output(int max_child, int root_parent, int *h_start, const int *array_buffer, FILE *output,
                                               int result, int *return_arg, int count_child, pid_t *pid,
                                               pid_t make_child, int *start, int *end, int *track_child_pid,
-                                              int parent_pipe,int initial_end, int *child_return);
+                                              int parent_pipe,int initial_end, int *child_return, clock_t begin);
 
 
 
@@ -160,7 +161,7 @@ get_input(char *const *argv, int *max_child, int *root_parent, int *h_start)
     (*h_start) = 0;
 
     temp = strtol(argv[INIT_VAL], &char_endptr, 10);
-    if (*char_endptr != '\0' || char_endptr == argv[INIT_VAL] || temp > INT_MAX || temp < INT_MIN)
+    if (*char_endptr != '\0' || char_endptr == argv[INIT_VAL] || temp > INT_MAX || temp < 10000)
     {
         fprintf(stderr, "incorrect number for L: %s\n", argv[INIT_VAL]);
         return EXIT_FAILURE;
@@ -168,7 +169,7 @@ get_input(char *const *argv, int *max_child, int *root_parent, int *h_start)
     L = (int)temp;
 
     temp = strtol(argv[2], &char_endptr, 10);
-    if (*char_endptr != '\0' || char_endptr == argv[2] || temp > INT_MAX || temp < INT_MIN)
+    if (*char_endptr != '\0' || char_endptr == argv[2] || temp < 30 || temp > 60)
     {
         fprintf(stderr, "incorrect number for H: %s\n", argv[2]);
         return EXIT_FAILURE;
@@ -194,12 +195,13 @@ get_input(char *const *argv, int *max_child, int *root_parent, int *h_start)
 
     if (!(*max_child >= MIN_CHILDREN_OPTIONS && *max_child <= MAX_CHILDREN_OPTIONS))
     {
-        fprintf(stderr, "invalid child number -> 2 or 3.\n");
+        fprintf(stderr, "invalid child number -> must be 2 or 3.\n");
         return EXIT_FAILURE;
     }
 
     return EXIT_SUCCESS;
 }
+
 
 void
 read_initialize_in_out_files(int **array_buffer, int *result, int *return_arg)
@@ -226,11 +228,11 @@ create_child_processes(int max_child, pid_t make_child, int count_child, const i
         {
             count_child++;
 
-            for (int l = 0; l < max_child; l++)
+            for (int j = 0; j < max_child; j++)
             {
-                if (track_child[l] == -INIT_VAL)
+                if (track_child[j] == -INIT_VAL)
                 {
-                    track_child[l] = (*return_arg) - INIT_VAL;
+                    track_child[j] = (*return_arg) - INIT_VAL;
                     break;
                 }
             }
@@ -290,13 +292,9 @@ get_return_arg_from_child(int max_child, int return_arg)
     {
         return_arg = 2 * (return_arg) - INIT_VAL;
     }
-    else if (max_child == 3)
-    {
-        return_arg = 3 * (return_arg) - 2;
-    }
     else
     {
-        return_arg = 4 * (return_arg) - 3;
+        return_arg = 3 * (return_arg) - 2;
     }
     return return_arg;
 }
@@ -305,12 +303,12 @@ int
 iter_to_track_child_pid(int max_child, int *track_child_pid)
 {
     int parent_pipe;
-    for (int l = 0; l < max_child; l++)
+    for (int i = 0; i < max_child; i++)
     {
-        if (track_child_pid[l] != -INIT_VAL)
+        if (track_child_pid[i] != -INIT_VAL)
         {
-            parent_pipe = track_child_pid[l];
-            track_child_pid[l] = -INIT_VAL;
+            parent_pipe = track_child_pid[i];
+            track_child_pid[i] = -INIT_VAL;
         }
     }
     return parent_pipe;
@@ -320,15 +318,15 @@ void
 store_child_return_in_buffer(int *h, const int *array_buffer, int start, int end, int child_return, int *h_start,
                              int *max, double *avg)
 {
-    for (int j = start; j < end; j++)
+    for (int i = start; i < end; i++)
     {
-        if (array_buffer[j] > (*max)) (*max) = array_buffer[j];
-        (*avg) += array_buffer[j];
+        if (array_buffer[i] > (*max)) (*max) = array_buffer[i];
+        (*avg) += array_buffer[i];
 
-        if (array_buffer[j] <= -INIT_VAL && array_buffer[j] >= -MAX_RANDOM_OFFSET)
+        if (array_buffer[i] <= -INIT_VAL && array_buffer[i] >= -MAX_RANDOM_OFFSET)
         {
             h[(*h_start)] = getpid();
-            h[(*h_start) + INIT_VAL] = j;
+            h[(*h_start) + INIT_VAL] = i;
             h[(*h_start) + 2] = child_return;
             (*h_start) = (*h_start) + 3;
         }
@@ -338,14 +336,14 @@ store_child_return_in_buffer(int *h, const int *array_buffer, int start, int end
 void
 track_start_and_end(int max_child, const int *track_child_pid, int initial_end, bool tracked, int *start, int *end,
                     bool *has_child, int *child_count) {
-    for (int r = 0; r < max_child; r++)
+    for (int i = 0; i < max_child; i++)
     {
-        if (track_child_pid[r] != -INIT_VAL)
+        if (track_child_pid[i] != -INIT_VAL)
         {
             (*has_child) = true;
             (*child_count)++;
         }
-        else if (track_child_pid[r] == -INIT_VAL && (*has_child) && !tracked)
+        else if (track_child_pid[i] == -INIT_VAL && (*has_child) && !tracked)
         {
             (*start) = (*end);
             (*end) = initial_end;
@@ -357,14 +355,14 @@ track_start_and_end(int max_child, const int *track_child_pid, int initial_end, 
 void
 local_avg_from_child_calc(int *h, const int *array_buffer, int start, int end, int child_return, int *h_start, int *max,
                           double *avg, int *count) {
-    for (int j2 = start; j2 < end; j2++) {
-        if (array_buffer[j2] > (*max)) (*max) = array_buffer[j2];
+    for (int i = start; i < end; i++) {
+        if (array_buffer[i] > (*max)) (*max) = array_buffer[i];
 
 
-        (*avg) += array_buffer[j2];
-        if (array_buffer[j2] <= -INIT_VAL && array_buffer[j2] >= -MAX_RANDOM_OFFSET) {
+        (*avg) += array_buffer[i];
+        if (array_buffer[i] <= -INIT_VAL && array_buffer[i] >= -MAX_RANDOM_OFFSET) {
             h[(*h_start)] = getpid();
-            h[(*h_start) + INIT_VAL] = j2;
+            h[(*h_start) + INIT_VAL] = i;
             h[(*h_start) + 2] = child_return;
             (*h_start) = (*h_start) + 3;
         }
@@ -386,7 +384,7 @@ read_from_buffer_and_get_avg(const int *fd, const int *track_child_pid, int coun
     {
         (*max) = (*temp_max);
     }
-    (*avg) = ((*avg) * count + (*temp_avg) * (*temp_count)) / (double)((*temp_count) + count); // Cast the divisor to double
+    (*avg) = ((*avg) * count + (*temp_avg) * (*temp_count)) / (double)((*temp_count) + count);
 }
 
 int
@@ -401,7 +399,8 @@ fill_in_keys_from_child(int *h, int h_start, const int *temp_h, int temp_h_start
 
 void
 setup_read(const int *fd, const int *track_child_pid, int r, int **h, int *h_start, int *max, double *avg,
-           int *count) {
+           int *count)
+{
     read(fd[2 * track_child_pid[r]], max, sizeof(int));
     read(fd[2 * track_child_pid[r]], avg, sizeof(long));
     read(fd[2 * track_child_pid[r]], count, sizeof(int));
@@ -410,7 +409,8 @@ setup_read(const int *fd, const int *track_child_pid, int r, int **h, int *h_sta
 }
 
 void
-setup_write(int **h, int *h_start, const int *fd, int parent_pipe, int *max, double *avg, int *count) {
+setup_write(int **h, int *h_start, const int *fd, int parent_pipe, int *max, double *avg, int *count)
+{
     write(fd[2 * parent_pipe + INIT_VAL], max, sizeof(int));
     write(fd[2 * parent_pipe + INIT_VAL], avg, sizeof(long));
     write(fd[2 * parent_pipe + INIT_VAL], count, sizeof(int));
@@ -419,7 +419,8 @@ setup_write(int **h, int *h_start, const int *fd, int parent_pipe, int *max, dou
 }
 
 void
-print_output_to_file(const int *h, FILE *output, int max, double avg) {
+print_output_to_file(const int *h, FILE *output, int max, double avg)
+{
     output = fopen(OUTPUT_FILE_NAME, FILE_MODE_APPEND);
     printf(RESULT_MSG_MAX_MIN, max, avg);
     fprintf(output, RESULT_MSG_MAX_MIN, max, avg);
@@ -435,11 +436,12 @@ print_output_to_file(const int *h, FILE *output, int max, double avg) {
 void
 process_children_to_parent_for_max_avg_output(int max_child, int root_parent, int *h_start, const int *array_buffer, FILE *output, int result, int *return_arg,
                                               int count_child, pid_t *pid, pid_t make_child, int *start, int *end, int *track_child_pid, int parent_pipe,
-                                              int initial_end, int *child_return) {
-    for (int j = 0; j < result; j++)
+                                              int initial_end, int *child_return, clock_t begin)
+{
+    for (int i = 0; i < result; i++)
     {
 
-        if (j != 0)
+        if (i != 0)
         {
             (*return_arg) = get_return_arg_from_child(max_child, (*return_arg));
         }
@@ -457,7 +459,7 @@ process_children_to_parent_for_max_avg_output(int max_child, int root_parent, in
             parent_pipe = iter_to_track_child_pid(max_child, track_child_pid);
             append_output_file(output, (*return_arg));
             (*pid) = getpid();
-            if (j == (result - INIT_VAL))
+            if (i == (result - INIT_VAL))
             {
                 int max = 0;
                 double avg = 0;
@@ -503,9 +505,9 @@ process_children_to_parent_for_max_avg_output(int max_child, int root_parent, in
             {
                 local_avg_from_child_calc(data_array, array_buffer, (*start), (*end), (*child_return), h_start, &max, &avg, &count);
 
-                for (int r = 0; r < child_count; r++)
+                for (int a = 0; a < child_count; a++)
                 {
-                    read_from_buffer_and_get_avg(fd, track_child_pid, count, &temp_max, &temp_avg, r, &max, &avg, &temp_count,
+                    read_from_buffer_and_get_avg(fd, track_child_pid, count, &temp_max, &temp_avg, a, &max, &avg, &temp_count,
                                                  (int **) &temp_h, &temp_h_start);
 
                     count += temp_count;
@@ -515,17 +517,17 @@ process_children_to_parent_for_max_avg_output(int max_child, int root_parent, in
             }
             else
             {
-                for (int r = 0; r < child_count; r++)
+                for (int j = 0; j < child_count; j++)
                 {
-                    if (r != 0) {
-                        read_from_buffer_and_get_avg(fd, track_child_pid, count, &temp_max, &temp_avg, r, &max, &avg, &temp_count,
+                    if (j != 0) {
+                        read_from_buffer_and_get_avg(fd, track_child_pid, count, &temp_max, &temp_avg, j, &max, &avg, &temp_count,
                                                      (int **) &temp_h, &temp_h_start);
 
                         (*h_start) = fill_in_keys_from_child(data_array, (*h_start), temp_h, temp_h_start);
                     }
                     else
                     {
-                        setup_read(fd, track_child_pid, r, (int **) &data_array, h_start, &max, &avg, &count);
+                        setup_read(fd, track_child_pid, j, (int **) &data_array, h_start, &max, &avg, &count);
                     }
                 }
             }
@@ -539,8 +541,12 @@ process_children_to_parent_for_max_avg_output(int max_child, int root_parent, in
                 wait(NULL);
                 print_output_to_file(data_array, output, max, avg);
                 clock_t end = clock();
-                spent_time += (double)(end - begin) / CLOCKS_PER_SEC;
-                printf(TIME_TAKEN_MSG, (spent_time));
+                if (end > begin) {
+                    spent_time += (double)(end - begin) / CLOCKS_PER_SEC;
+                } else {
+                    spent_time = 0.0;
+                }
+                printf(TIME_TAKEN_MSG, spent_time);
                 exit(0);
             }
             wait(NULL);
@@ -551,7 +557,7 @@ process_children_to_parent_for_max_avg_output(int max_child, int root_parent, in
 
 int
 main(int argc, char* argv[]) {
-    begin = clock();
+    clock_t begin = clock();
 
     if (argc != 4)
     {
@@ -585,5 +591,5 @@ main(int argc, char* argv[]) {
     int track_child_pid[4] = {-INIT_VAL, -INIT_VAL, -INIT_VAL, -INIT_VAL};
     int parent_pipe = -INIT_VAL;
     int initial_end, child_return;
-    process_children_to_parent_for_max_avg_output(max_child, root_parent, &h_start, array_buffer, output, result, &return_arg, count_child, &pid, make_child, &start, &end, track_child_pid, parent_pipe, initial_end, &child_return);
+    process_children_to_parent_for_max_avg_output(max_child, root_parent, &h_start, array_buffer, output, result, &return_arg, count_child, &pid, make_child, &start, &end, track_child_pid, parent_pipe, initial_end, &child_return, begin);
 }
